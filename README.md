@@ -1,99 +1,86 @@
 # Budget Tracker
 
-> A clean, Discord-inspired personal budget tracker — built with vanilla HTML, CSS & JS. No backend, no accounts, no BS.
+A clean, Discord-inspired personal budget tracker — built with vanilla HTML, CSS & JS. No backend, no accounts, no BS.
 
-![Budget Tracker Preview](https://img.shields.io/badge/status-ready%20to%20use-57f287?style=for-the-badge)
-![No Dependencies](https://img.shields.io/badge/dependencies-zero-5865f2?style=for-the-badge)
-![Saves Locally](https://img.shields.io/badge/storage-localStorage-fee75c?style=for-the-badge)
-
----
-
-## ✨ Features
-
-### 💰 Income Calculator
-- **Hourly or Salary** — switch between pay types with one click
-- Enter your **hourly rate + hours per week**, or just your annual salary
-- Calculates gross pay across weekly, bi-weekly, semi-monthly, and monthly periods
-- Deducts:
-  - Federal income tax %
-  - State tax % (defaults shown for Arizona ~2.5%)
-  - FICA / Social Security (7.65%)
-  - Other deductions (401k, health insurance, etc.) per paycheck
-
-### ⛽ Gas Tracker
-- Enter **price per gallon**, **gallons per fill-up**, and **fill-ups per month**
-- Auto-calculates your monthly gas cost
-- **💑 Split with GF button** — one click divides the cost in half and shows the math
-
-### 📋 Expense Tracker
-- Add unlimited expenses with custom names
-- Each expense supports **5 frequency types**:
-  - Weekly
-  - Bi-weekly
-  - Monthly
-  - Every 6 months
-  - Yearly
-- All expenses are automatically **converted to monthly** for calculations
-- **💑 Split toggle on every expense** — splits any bill in half with your girlfriend
-- Delete any expense with the `×` button
-
-### 📊 Summary Dashboard
-- **4 stat cards** — Monthly income, Monthly expenses, Monthly leftover, Annual leftover
-- **Expense ratio progress bar** — visual indicator of how much of your income goes to bills
-  - Green → under 50% (healthy)
-  - Yellow → 50–75% (watch it)
-  - Red → 75%+ (tight)
-- **Income Breakdown Table** — gross vs net across every pay period
-- **Expense Breakdown Table** — every bill listed with split indicator and monthly equivalent
-- **Leftover Breakdown** — weekly / monthly / 6-month / annual money left after all expenses
-
-### 💾 Auto-Save
-- Everything saves automatically to your browser's `localStorage` — no account needed
-- Comes back exactly where you left off on reload
+![HTML](https://img.shields.io/badge/HTML-5-E34F26?style=flat&logo=html5&logoColor=white)
+![CSS](https://img.shields.io/badge/CSS-3-1572B6?style=flat&logo=css3&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-ES6-F7DF1E?style=flat&logo=javascript&logoColor=black)
 
 ---
 
-## 🚀 How to Use
+## How It Works
 
-1. **Download** `index.html`
-2. **Double-click** to open in your browser — that's it, no server needed
-3. Fill in your income details in section **01**
-4. Add your gas info in section **02** and hit the split button if needed
-5. Add your bills in section **03** — set the frequency and split any shared ones
-6. Watch the **Summary** section at the bottom update in real time
+1. Enter your **hourly rate + hours/week** or annual salary in the Income section
+2. The app calculates your gross and net pay across all pay periods, deducting federal tax, state tax, FICA, and any custom deductions
+3. Add your gas info — price per gallon, gallons per fill-up, and fill-ups per month — and it auto-calculates your monthly fuel cost
+4. Add any expense with a name, amount, and frequency (weekly through yearly) — everything is auto-converted to monthly
+5. Hit the **Split with GF** button on gas or any individual expense to divide the cost in half
+6. Watch the **Summary** section update in real time — income, expenses, leftover, and an expense ratio bar
 
 ---
 
-## 📁 File Structure
+## Features
+
+- **Hourly or salary mode** — switch pay types with one click
+- **Gas tracker** — calculates monthly fuel cost with a one-click split
+- **Unlimited expenses** — 5 frequency types (weekly, bi-weekly, monthly, every 6 months, yearly), all normalized to monthly
+- **Per-expense split toggle** — share any bill in half with your girlfriend, with the math shown
+- **Summary dashboard** — 4 stat cards, expense ratio progress bar (green/yellow/red), income breakdown table, expense breakdown table, and leftover breakdown
+- **Auto-save** — everything persists to `localStorage`; comes back exactly where you left off on reload
+- **Zero dependencies** — single HTML file, no npm, no build step, no server
+
+---
+
+## What Changed vs Basic Budgeting Spreadsheets
+
+| Problem | Before | After |
+|---|---|---|
+| Pay period math | Manual calculation per period | Auto-calculates weekly, bi-weekly, semi-monthly, monthly |
+| Tax deductions | Single flat rate | Federal %, state %, FICA (7.65%), and custom deductions |
+| Expense frequency | Everything had to be monthly | 5 frequency types — all auto-converted to monthly |
+| Shared expenses | Manual halving | Per-item split toggle with inline math shown |
+| Fuel cost | Separate tracking | Built-in gas calculator with split support |
+| Persistence | Re-enter every session | Auto-saves to localStorage |
+
+---
+
+## Setup
+
+1. Download `index.html`
+2. Double-click to open in any browser — that's it, no server needed
+3. Fill in your income in section **01**
+4. Add your gas info in section **02**
+5. Add your bills in section **03**
+6. View totals in the **Summary** section at the bottom
+
+> **Note:** All data stays 100% on your device — nothing is sent anywhere. Works completely offline.
+
+---
+
+## Project Structure
 
 ```
 budget-tracker/
-└── index.html   ← everything is in here (HTML + CSS + JS)
+└── index.html   ← everything is here (HTML + CSS + JS, single file)
 ```
 
-Single file. No build step. No npm install. Just open it.
+---
+
+## Tech Stack
+
+| Technology | Usage |
+|---|---|
+| HTML / CSS | Layout and Discord-inspired dark theme |
+| Vanilla JS | All calculations, state management, and DOM updates |
+| localStorage | Automatic persistence across sessions |
 
 ---
 
-## 🎨 Design
+## Customization
 
-- **Dark theme** inspired by Discord's UI
-- Color palette:
-  - `#5865f2` — Discord blurple (accent)
-  - `#57f287` — green (income / positive)
-  - `#ed4245` — red (expenses / negative)
-  - `#fee75c` — yellow (warnings / gas)
-  - `#eb459e` — pink (split with GF indicator)
-- Fonts: **DM Sans** + **JetBrains Mono**
-- Fully responsive — works on mobile too
+Open `index.html` in any editor and look for these easy tweaks:
 
----
-
-## 🛠 Customization
-
-Open `index.html` in VSCode and look for these easy tweaks:
-
-**Change default expenses** — find `DEFAULT_EXPENSES` array near the top of the `<script>` tag:
+**Default expenses** — find `DEFAULT_EXPENSES` near the top of the `<script>` tag:
 ```js
 const DEFAULT_EXPENSES = [
   { name: 'Rent / Mortgage', amount: '', freq: 'monthly', split: false },
@@ -101,24 +88,26 @@ const DEFAULT_EXPENSES = [
 ];
 ```
 
-**Change location for tax hint** — find the label text:
+**State tax label** — find this line in the HTML and update the hint:
 ```html
 State Tax % <span>(AZ ~2.5%)</span>
 ```
 
-**Change accent color** — find `:root` in the CSS and change `--accent`:
+**Accent color** — find `:root` in the CSS:
 ```css
 --accent: #5865f2;  /* change this hex */
 ```
 
 ---
 
-## 📝 Notes
+## Known Limitations
 
-- All data stays **100% on your device** — nothing is sent anywhere
-- Works completely **offline**
-- To reset everything: open browser DevTools → Application → Local Storage → clear `budgetData`
+- **No multi-device sync** — localStorage is browser and device-specific
+- **No income history** — tracks current setup only, not changes over time
+- **Split is always 50/50** — no custom split ratios
 
 ---
 
-*Built with ❤️ — no frameworks, no build tools, just a single HTML file.*
+## To Reset
+
+Open browser DevTools → Application → Local Storage → clear the `budgetData` key.
