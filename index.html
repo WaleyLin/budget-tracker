@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>💸 Budget Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0e1117;
+      --bg2: #151921;
+      --card: #1a1f2e;
+      --card2: #1f2535;
+      --border: rgba(255,255,255,0.07);
+      --border2: rgba(255,255,255,0.13);
+      --accent: #5865f2;
+      --accent-g: #57f287;
+      --accent-r: #ed4245;
+      --accent-y: #fee75c;
+      --accent-pk: #eb459e;
+      --glow: rgba(88,101,242,0.3);
+      --green-glow: rgba(87,242,135,0.25);
+      --red-glow: rgba(237,66,69,0.25);
+      --txt: #e3e5e8;
+      --txt2: #8e9297;
+      --txt3: #4f545c;
+      --mono: 'JetBrains Mono', monospace;
+      --sans: 'DM Sans', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--txt);
+      min-height: 100vh;
+      padding: 0 0 80px;
+      background-image:
+        radial-gradient(ellipse 80% 50% at 20% -20%, rgba(88,101,242,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 110%, rgba(87,242,135,0.07) 0%, transparent 50%);
+    }
+
+    /* ── HEADER ── */
+    header {
+      padding: 28px 40px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 14px;
+      background: rgba(14,17,23,0.8);
+      backdrop-filter: blur(12px);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .header-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: var(--accent); display: flex; align-items: center; justify-content: center;
+      font-size: 18px; box-shadow: 0 0 20px var(--glow);
+    }
+    header h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
+    header span { font-size: 13px; color: var(--txt2); margin-left: 4px; }
+    .header-save {
+      margin-left: auto;
+      background: var(--card2); border: 1px solid var(--border2);
+      color: var(--txt2); padding: 7px 16px; border-radius: 8px;
+      font-size: 13px; font-family: var(--sans); font-weight: 500;
+      cursor: pointer; transition: all 0.15s;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .header-save:hover { background: var(--accent); color: #fff; border-color: var(--accent); box-shadow: 0 0 12px var(--glow); }
+
+    /* ── LAYOUT ── */
+    .page { max-width: 1100px; margin: 0 auto; padding: 36px 40px 0; }
+
+    .section-label {
+      font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--txt3);
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 14px;
+    }
+    .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    /* ── CARDS ── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px 24px;
+      margin-bottom: 16px;
+      transition: border-color 0.2s;
+    }
+    .card:hover { border-color: var(--border2); }
+    .card-title {
+      font-size: 15px; font-weight: 600; margin-bottom: 18px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .card-title .dot {
+      width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+    }
+
+    /* ── GRID ── */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+    .grid-auto { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); gap: 14px; }
+
+    /* ── INPUTS ── */
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label {
+      font-size: 11px; font-weight: 600; letter-spacing: 0.05em;
+      text-transform: uppercase; color: var(--txt2);
+    }
+    .field-row { display: flex; align-items: center; gap: 0; }
+    .prefix {
+      background: var(--card2); border: 1px solid var(--border);
+      border-right: none; color: var(--txt2);
+      padding: 9px 11px; border-radius: 8px 0 0 8px;
+      font-size: 13px; font-family: var(--mono);
+      display: flex; align-items: center;
+    }
+    input[type="number"], input[type="text"], select {
+      flex: 1;
+      background: var(--card2); border: 1px solid var(--border);
+      color: var(--txt); padding: 9px 12px; border-radius: 8px;
+      font-size: 14px; font-family: var(--mono);
+      transition: border-color 0.15s, box-shadow 0.15s;
+      -moz-appearance: textfield; appearance: textfield;
+      width: 100%;
+    }
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+    .field-row input[type="number"], .field-row input[type="text"] {
+      border-radius: 0 8px 8px 0;
+    }
+    input:focus, select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(88,101,242,0.12); }
+    input::placeholder { color: var(--txt3); }
+    select {
+      cursor: pointer; -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%238e9297' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 12px center;
+      padding-right: 32px;
+    }
+    select option { background: #1a1f2e; }
+
+    /* ── TOGGLE ROW ── */
+    .toggle-row { display: flex; gap: 8px; }
+    .toggle-btn {
+      flex: 1; padding: 9px 10px; border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--card2); color: var(--txt2);
+      font-size: 13px; font-family: var(--sans); font-weight: 500;
+      cursor: pointer; transition: all 0.15s; text-align: center;
+    }
+    .toggle-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); box-shadow: 0 0 10px var(--glow); }
+    .toggle-btn.active-green { background: var(--accent-g); color: #0e1117; border-color: var(--accent-g); box-shadow: 0 0 10px var(--green-glow); }
+
+    /* ── EXPENSE ROWS ── */
+    .expense-list { display: flex; flex-direction: column; gap: 10px; }
+    .expense-row {
+      display: grid;
+      grid-template-columns: 1fr 160px 120px 44px;
+      gap: 8px; align-items: center;
+    }
+    .expense-row .split-btn {
+      padding: 8px 10px; border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--card2); color: var(--txt2);
+      font-size: 11px; font-family: var(--sans); font-weight: 600;
+      cursor: pointer; transition: all 0.15s; text-align: center;
+      white-space: nowrap; letter-spacing: 0.03em;
+    }
+    .expense-row .split-btn.split-on {
+      background: rgba(235,69,158,0.15);
+      border-color: var(--accent-pk);
+      color: var(--accent-pk);
+    }
+    .del-btn {
+      width: 34px; height: 34px; border-radius: 8px;
+      border: 1px solid var(--border);
+      background: transparent; color: var(--txt3);
+      cursor: pointer; transition: all 0.15s;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; flex-shrink: 0;
+    }
+    .del-btn:hover { background: rgba(237,66,69,0.12); color: var(--accent-r); border-color: var(--accent-r); }
+
+    .add-expense-btn {
+      width: 100%; margin-top: 10px;
+      padding: 9px; border-radius: 8px;
+      border: 1px dashed var(--border2);
+      background: transparent; color: var(--txt2);
+      font-size: 13px; font-family: var(--sans); font-weight: 500;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .add-expense-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(88,101,242,0.06); }
+
+    /* ── GAS CARD ── */
+    .gas-card {
+      background: linear-gradient(135deg, rgba(254,231,92,0.06) 0%, rgba(88,101,242,0.06) 100%);
+      border-color: rgba(254,231,92,0.2);
+    }
+    .gas-card:hover { border-color: rgba(254,231,92,0.35); }
+
+    /* ── SUMMARY ── */
+    .summary-section { margin-top: 32px; }
+    .summary-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 16px; }
+    .stat-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 18px 20px;
+      transition: all 0.2s;
+    }
+    .stat-card:hover { transform: translateY(-2px); }
+    .stat-label { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--txt2); margin-bottom: 8px; }
+    .stat-value {
+      font-family: var(--mono); font-size: 22px; font-weight: 600;
+      letter-spacing: -0.5px;
+    }
+    .stat-sub { font-size: 11px; color: var(--txt3); margin-top: 4px; }
+    .stat-card.green { border-color: rgba(87,242,135,0.2); background: linear-gradient(135deg, rgba(87,242,135,0.05) 0%, var(--card) 60%); }
+    .stat-card.green .stat-value { color: var(--accent-g); }
+    .stat-card.red   { border-color: rgba(237,66,69,0.2);   background: linear-gradient(135deg, rgba(237,66,69,0.05)   0%, var(--card) 60%); }
+    .stat-card.red   .stat-value   { color: var(--accent-r); }
+    .stat-card.blue  { border-color: rgba(88,101,242,0.2);  background: linear-gradient(135deg, rgba(88,101,242,0.06)  0%, var(--card) 60%); }
+    .stat-card.blue  .stat-value   { color: #7289da; }
+    .stat-card.yellow{ border-color: rgba(254,231,92,0.2);  background: linear-gradient(135deg, rgba(254,231,92,0.05)  0%, var(--card) 60%); }
+    .stat-card.yellow .stat-value  { color: var(--accent-y); }
+
+    /* ── BREAKDOWN TABLE ── */
+    .breakdown-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 16px; overflow: hidden; margin-bottom: 16px;
+    }
+    .breakdown-header {
+      padding: 16px 22px; border-bottom: 1px solid var(--border);
+      font-size: 13px; font-weight: 600; color: var(--txt2);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .breakdown-table { width: 100%; border-collapse: collapse; }
+    .breakdown-table td, .breakdown-table th {
+      padding: 12px 22px; font-size: 13px;
+      border-bottom: 1px solid var(--border);
+    }
+    .breakdown-table th {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--txt3);
+      background: rgba(0,0,0,0.15);
+    }
+    .breakdown-table tr:last-child td { border-bottom: none; }
+    .breakdown-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .td-name { color: var(--txt); font-weight: 500; }
+    .td-freq { color: var(--txt2); font-size: 11px; }
+    .td-amount { font-family: var(--mono); font-weight: 600; text-align: right; }
+    .td-split { color: var(--accent-pk); font-size: 11px; text-align: center; }
+    .td-monthly { font-family: var(--mono); text-align: right; color: var(--txt2); }
+    .breakdown-total td {
+      border-top: 1px solid var(--border2);
+      font-weight: 700; color: var(--txt);
+      background: rgba(255,255,255,0.02);
+    }
+
+    /* ── PROGRESS BAR ── */
+    .progress-wrap { margin-top: 16px; }
+    .progress-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--txt2); margin-bottom: 8px; }
+    .progress-bar { height: 8px; background: var(--card2); border-radius: 99px; overflow: hidden; border: 1px solid var(--border); }
+    .progress-fill {
+      height: 100%; border-radius: 99px;
+      background: linear-gradient(90deg, var(--accent-g), var(--accent));
+      transition: width 0.6s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .progress-fill.warn { background: linear-gradient(90deg, var(--accent-y), #f59e0b); }
+    .progress-fill.danger { background: linear-gradient(90deg, var(--accent-r), #dc2626); }
+
+    /* ── TOAST ── */
+    #toast {
+      position: fixed; bottom: 28px; left: 50%;
+      transform: translateX(-50%) translateY(16px);
+      background: var(--card2); border: 1px solid var(--border2);
+      color: var(--txt); font-size: 13px; font-family: var(--sans);
+      padding: 10px 20px; border-radius: 10px;
+      opacity: 0; transition: all 0.25s; pointer-events: none; z-index: 999;
+    }
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .page { padding: 20px 16px 0; }
+      header { padding: 20px 16px; }
+      .summary-grid { grid-template-columns: 1fr 1fr; }
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .expense-row { grid-template-columns: 1fr 120px 34px; }
+      .expense-row .split-btn { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-icon">💸</div>
+    <div>
+      <h1>Budget Tracker <span>— your money, clearly</span></h1>
+    </div>
+    <button class="header-save" onclick="saveAll()">💾 Save</button>
+  </header>
+
+  <div class="page">
+
+    <!-- ══ INCOME ══ -->
+    <div class="section-label">01 — Income</div>
+    <div class="card">
+      <div class="card-title">
+        <div class="dot" style="background:var(--accent-g)"></div>
+        How much do you make?
+      </div>
+      <div class="grid-2" style="margin-bottom:14px">
+        <div class="field">
+          <label>Pay Type</label>
+          <div class="toggle-row">
+            <button class="toggle-btn active" id="btnHourly" onclick="setPayType('hourly')">⏱ Hourly</button>
+            <button class="toggle-btn" id="btnSalary" onclick="setPayType('salary')">📅 Salary</button>
+          </div>
+        </div>
+        <div class="field" id="payRateField">
+          <label id="payRateLabel">Hourly Rate</label>
+          <div class="field-row">
+            <span class="prefix">$</span>
+            <input type="number" id="payRate" placeholder="18.50" min="0" step="0.01" oninput="calc()">
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-3" id="hourlyFields">
+        <div class="field">
+          <label>Hours Per Week</label>
+          <input type="number" id="hoursPerWeek" placeholder="40" min="0" max="168" oninput="calc()">
+        </div>
+        <div class="field">
+          <label>Weeks Per Year</label>
+          <input type="number" id="weeksPerYear" placeholder="52" min="1" max="52" oninput="calc()">
+        </div>
+        <div class="field">
+          <label>Pay Frequency</label>
+          <select id="payFreq" onchange="calc()">
+            <option value="weekly">Weekly</option>
+            <option value="biweekly" selected>Bi-weekly</option>
+            <option value="semimonthly">Semi-monthly</option>
+            <option value="monthly">Monthly</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid-2" id="taxFields" style="margin-top:14px">
+        <div class="field">
+          <label>Federal Tax %</label>
+          <div class="field-row">
+            <span class="prefix">%</span>
+            <input type="number" id="fedTax" placeholder="22" min="0" max="100" step="0.1" oninput="calc()">
+          </div>
+        </div>
+        <div class="field">
+          <label>State Tax % <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--txt3)">(AZ ~2.5%)</span></label>
+          <div class="field-row">
+            <span class="prefix">%</span>
+            <input type="number" id="stateTax" placeholder="2.5" min="0" max="20" step="0.1" oninput="calc()">
+          </div>
+        </div>
+        <div class="field">
+          <label>FICA / Social Security %</label>
+          <div class="field-row">
+            <span class="prefix">%</span>
+            <input type="number" id="ficaTax" placeholder="7.65" min="0" max="20" step="0.01" oninput="calc()">
+          </div>
+        </div>
+        <div class="field">
+          <label>Other Deductions (401k, etc.) $</label>
+          <div class="field-row">
+            <span class="prefix">$</span>
+            <input type="number" id="otherDeductions" placeholder="0" min="0" step="0.01" oninput="calc()">
+          </div>
+        </div>
+      </div>
+
+      <!-- Income summary pills -->
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px" id="incomePills"></div>
+    </div>
+
+    <!-- ══ GAS ══ -->
+    <div class="section-label" style="margin-top:28px">02 — Gas</div>
+    <div class="card gas-card">
+      <div class="card-title">
+        <div class="dot" style="background:var(--accent-y)"></div>
+        ⛽ Gas Expenses
+      </div>
+      <div class="grid-3">
+        <div class="field">
+          <label>Price per Gallon ($)</label>
+          <div class="field-row">
+            <span class="prefix">$</span>
+            <input type="number" id="gasPrice" placeholder="3.45" min="0" step="0.01" oninput="calc()">
+          </div>
+        </div>
+        <div class="field">
+          <label>Gallons Per Fill-up</label>
+          <input type="number" id="gasGallons" placeholder="12" min="0" step="0.1" oninput="calc()">
+        </div>
+        <div class="field">
+          <label>Fill-ups Per Month</label>
+          <input type="number" id="gasFillups" placeholder="4" min="0" step="0.5" oninput="calc()">
+        </div>
+      </div>
+      <div style="margin-top:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <button class="toggle-btn" id="gasSplitBtn" style="max-width:200px;flex-shrink:0" onclick="toggleGasSplit()">
+          💑 Split with GF?
+        </button>
+        <span id="gasCalcLine" style="font-family:var(--mono);font-size:13px;color:var(--txt2)"></span>
+      </div>
+    </div>
+
+    <!-- ══ EXPENSES ══ -->
+    <div class="section-label" style="margin-top:28px">03 — Monthly Expenses</div>
+    <div class="card">
+      <div class="card-title">
+        <div class="dot" style="background:var(--accent-r)"></div>
+        Recurring Expenses
+        <span style="font-size:12px;font-weight:400;color:var(--txt2);margin-left:4px">— click 💑 to split any expense with your GF</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 160px 120px 44px;gap:8px;margin-bottom:8px">
+        <div style="font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--txt3);padding:0 12px">Expense Name</div>
+        <div style="font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--txt3);padding:0 12px">Amount</div>
+        <div style="font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--txt3);padding:0 12px">Frequency</div>
+        <div></div>
+      </div>
+      <div class="expense-list" id="expenseList"></div>
+      <button class="add-expense-btn" onclick="addExpense()">+ Add Expense</button>
+    </div>
+
+    <!-- ══ SUMMARY ══ -->
+    <div class="summary-section">
+      <div class="section-label">04 — Summary</div>
+
+      <div class="summary-grid" id="summaryGrid">
+        <div class="stat-card blue">
+          <div class="stat-label">Monthly Take-Home</div>
+          <div class="stat-value" id="s_monthly_income">$0</div>
+          <div class="stat-sub">after taxes & deductions</div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-label">Monthly Expenses</div>
+          <div class="stat-value" id="s_monthly_expenses">$0</div>
+          <div class="stat-sub">all bills + gas</div>
+        </div>
+        <div class="stat-card green" id="s_leftover_card">
+          <div class="stat-label">Monthly Leftover</div>
+          <div class="stat-value" id="s_monthly_leftover">$0</div>
+          <div class="stat-sub" id="s_leftover_sub">ready to save or spend</div>
+        </div>
+        <div class="stat-card yellow">
+          <div class="stat-label">Annual Leftover</div>
+          <div class="stat-value" id="s_annual_leftover">$0</div>
+          <div class="stat-sub">after all expenses × 12</div>
+        </div>
+      </div>
+
+      <!-- Progress bar -->
+      <div class="card" style="margin-bottom:16px">
+        <div style="font-size:13px;font-weight:600;margin-bottom:14px;color:var(--txt2)">Expense Ratio — how much of your income goes to bills</div>
+        <div class="progress-wrap">
+          <div class="progress-label">
+            <span id="prog_label_left">$0 expenses</span>
+            <span id="prog_label_right">0% of income</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--txt3);margin-top:6px">
+            <span>0%</span><span style="color:var(--accent-g)">50% — healthy</span><span style="color:var(--accent-y)">75% — tight</span><span style="color:var(--accent-r)">100%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Per-period breakdown -->
+      <div class="breakdown-card">
+        <div class="breakdown-header">
+          <span>💰 Income Breakdown</span>
+          <span style="font-size:11px;color:var(--txt3)">gross → net</span>
+        </div>
+        <table class="breakdown-table">
+          <thead><tr>
+            <th>Period</th><th style="text-align:right">Gross</th>
+            <th style="text-align:right">Taxes & Ded.</th>
+            <th style="text-align:right">Net Take-Home</th>
+          </tr></thead>
+          <tbody id="incomeBreakdown"></tbody>
+        </table>
+      </div>
+
+      <div class="breakdown-card">
+        <div class="breakdown-header">
+          <span>📋 Expense Breakdown</span>
+          <span style="font-size:11px;color:var(--txt3)">all converted to monthly</span>
+        </div>
+        <table class="breakdown-table">
+          <thead><tr>
+            <th>Expense</th><th style="text-align:center">Split</th>
+            <th style="text-align:right">Original</th>
+            <th style="text-align:right">Your Monthly</th>
+          </tr></thead>
+          <tbody id="expenseBreakdown"></tbody>
+        </table>
+      </div>
+
+      <!-- Per-period summary -->
+      <div class="breakdown-card">
+        <div class="breakdown-header">
+          <span>📊 Money Left After Expenses</span>
+        </div>
+        <table class="breakdown-table">
+          <thead><tr>
+            <th>Period</th><th style="text-align:right">Take-Home</th>
+            <th style="text-align:right">Expenses</th>
+            <th style="text-align:right">Leftover</th>
+          </tr></thead>
+          <tbody id="leftoverBreakdown"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+
+  <script>
+    // ── STATE ──
+    let payType = 'hourly';
+    let gasSplit = false;
+    let expenses = [];
+
+    const DEFAULT_EXPENSES = [
+      { name: 'Rent / Mortgage', amount: '', freq: 'monthly', split: false },
+      { name: 'Car Payment',     amount: '', freq: 'monthly', split: false },
+      { name: 'Car Insurance',   amount: '', freq: 'monthly', split: false },
+      { name: 'Phone Bill',      amount: '', freq: 'monthly', split: false },
+      { name: 'Groceries',       amount: '', freq: 'monthly', split: false },
+      { name: 'Streaming (Netflix, etc)', amount: '', freq: 'monthly', split: false },
+      { name: 'Eating Out',      amount: '', freq: 'weekly',  split: false },
+    ];
+
+    // ── INIT ──
+    function init() {
+      const saved = localStorage.getItem('budgetData');
+      if (saved) {
+        const d = JSON.parse(saved);
+        setField('payRate', d.payRate);
+        setField('hoursPerWeek', d.hoursPerWeek);
+        setField('weeksPerYear', d.weeksPerYear);
+        setField('fedTax', d.fedTax);
+        setField('stateTax', d.stateTax);
+        setField('ficaTax', d.ficaTax);
+        setField('otherDeductions', d.otherDeductions);
+        setField('gasPrice', d.gasPrice);
+        setField('gasGallons', d.gasGallons);
+        setField('gasFillups', d.gasFillups);
+        if (d.payFreq) document.getElementById('payFreq').value = d.payFreq;
+        if (d.payType) setPayType(d.payType, true);
+        gasSplit = d.gasSplit || false;
+        expenses = d.expenses || DEFAULT_EXPENSES.map(e=>({...e}));
+        updateGasSplitBtn();
+      } else {
+        expenses = DEFAULT_EXPENSES.map(e=>({...e}));
+      }
+      renderExpenses();
+      calc();
+    }
+
+    function setField(id, val) {
+      const el = document.getElementById(id);
+      if (el && val !== undefined && val !== '') el.value = val;
+    }
+
+    // ── PAY TYPE ──
+    function setPayType(type, silent) {
+      payType = type;
+      document.getElementById('btnHourly').classList.toggle('active', type==='hourly');
+      document.getElementById('btnSalary').classList.toggle('active', type==='salary');
+      const hf = document.getElementById('hourlyFields');
+      const rl = document.getElementById('payRateLabel');
+      if (type === 'hourly') {
+        hf.style.display = 'grid';
+        rl.textContent = 'Hourly Rate';
+      } else {
+        hf.style.display = 'none';
+        rl.textContent = 'Annual Salary';
+      }
+      if (!silent) calc();
+    }
+
+    // ── GAS SPLIT ──
+    function toggleGasSplit() {
+      gasSplit = !gasSplit;
+      updateGasSplitBtn();
+      calc();
+    }
+    function updateGasSplitBtn() {
+      const btn = document.getElementById('gasSplitBtn');
+      if (gasSplit) {
+        btn.classList.add('active-green');
+        btn.textContent = '💑 Split with GF ✓';
+      } else {
+        btn.classList.remove('active-green');
+        btn.textContent = '💑 Split with GF?';
+      }
+    }
+
+    // ── EXPENSES ──
+    function renderExpenses() {
+      const list = document.getElementById('expenseList');
+      list.innerHTML = '';
+      expenses.forEach((exp, i) => {
+        const row = document.createElement('div');
+        row.className = 'expense-row';
+        row.innerHTML = `
+          <input type="text" placeholder="e.g. Netflix" value="${exp.name}" oninput="updateExp(${i},'name',this.value)">
+          <div class="field-row" style="border-radius:8px">
+            <span class="prefix">$</span>
+            <input type="number" placeholder="0.00" value="${exp.amount}" min="0" step="0.01" oninput="updateExp(${i},'amount',this.value)" style="border-radius:0 8px 8px 0">
+          </div>
+          <select onchange="updateExp(${i},'freq',this.value)">
+            <option value="weekly" ${exp.freq==='weekly'?'selected':''}>Weekly</option>
+            <option value="biweekly" ${exp.freq==='biweekly'?'selected':''}>Bi-weekly</option>
+            <option value="monthly" ${exp.freq==='monthly'?'selected':''}>Monthly</option>
+            <option value="6months" ${exp.freq==='6months'?'selected':''}>6 Months</option>
+            <option value="yearly" ${exp.freq==='yearly'?'selected':''}>Yearly</option>
+          </select>
+          <button class="split-btn ${exp.split?'split-on':''}" onclick="toggleExpSplit(${i})" title="Split this expense with GF — divides it by 2">💑</button>
+          <button class="del-btn" onclick="removeExp(${i})">×</button>
+        `;
+        list.appendChild(row);
+      });
+    }
+
+    function updateExp(i, key, val) {
+      expenses[i][key] = key==='amount' ? val : val;
+      calc();
+    }
+    function toggleExpSplit(i) {
+      expenses[i].split = !expenses[i].split;
+      renderExpenses();
+      calc();
+    }
+    function removeExp(i) {
+      expenses.splice(i,1);
+      renderExpenses();
+      calc();
+    }
+    function addExpense() {
+      expenses.push({ name: '', amount: '', freq: 'monthly', split: false });
+      renderExpenses();
+      // focus name field of new row
+      setTimeout(()=>{
+        const rows = document.querySelectorAll('.expense-row input[type="text"]');
+        if(rows.length) rows[rows.length-1].focus();
+      },0);
+    }
+
+    // ── TO MONTHLY ──
+    function toMonthly(amount, freq) {
+      const a = parseFloat(amount) || 0;
+      switch(freq) {
+        case 'weekly':    return a * 52 / 12;
+        case 'biweekly':  return a * 26 / 12;
+        case 'monthly':   return a;
+        case '6months':   return a / 6;
+        case 'yearly':    return a / 12;
+        default:          return a;
+      }
+    }
+
+    function freqLabel(freq) {
+      return { weekly:'Weekly', biweekly:'Bi-weekly', monthly:'Monthly', '6months':'Every 6 Mo', yearly:'Yearly' }[freq] || freq;
+    }
+
+    // ── MAIN CALC ──
+    function calc() {
+      // INCOME
+      const payRate = parseFloat(document.getElementById('payRate').value) || 0;
+      const hoursPerWeek = parseFloat(document.getElementById('hoursPerWeek').value) || 0;
+      const weeksPerYear = parseFloat(document.getElementById('weeksPerYear').value) || 52;
+      const fedTax = (parseFloat(document.getElementById('fedTax').value) || 0) / 100;
+      const stateTax = (parseFloat(document.getElementById('stateTax').value) || 0) / 100;
+      const ficaTax = (parseFloat(document.getElementById('ficaTax').value) || 0) / 100;
+      const otherDed = parseFloat(document.getElementById('otherDeductions').value) || 0; // per paycheck
+
+      let grossAnnual = 0;
+      if (payType === 'hourly') {
+        grossAnnual = payRate * hoursPerWeek * weeksPerYear;
+      } else {
+        grossAnnual = payRate;
+      }
+
+      const totalTaxRate = fedTax + stateTax + ficaTax;
+      const annualTaxes = grossAnnual * totalTaxRate;
+
+      // Determine pay periods per year for other deductions
+      const payFreq = document.getElementById('payFreq').value;
+      const periodsPerYear = { weekly:52, biweekly:26, semimonthly:24, monthly:12 }[payFreq] || 26;
+      const annualOtherDed = otherDed * periodsPerYear;
+
+      const netAnnual = grossAnnual - annualTaxes - annualOtherDed;
+      const netMonthly = netAnnual / 12;
+      const netWeekly  = netAnnual / 52;
+
+      // GAS
+      const gasPrice   = parseFloat(document.getElementById('gasPrice').value) || 0;
+      const gasGallons = parseFloat(document.getElementById('gasGallons').value) || 0;
+      const gasFillups = parseFloat(document.getElementById('gasFillups').value) || 0;
+      let gasCostRaw = gasPrice * gasGallons * gasFillups; // monthly
+      let gasCostYou = gasSplit ? gasCostRaw / 2 : gasCostRaw;
+
+      // Update gas calc line
+      const gasLine = document.getElementById('gasCalcLine');
+      if (gasCostRaw > 0) {
+        if (gasSplit) {
+          gasLine.textContent = `$${fmt(gasCostRaw)}/mo ÷ 2 = $${fmt(gasCostYou)}/mo your share`;
+        } else {
+          gasLine.textContent = `$${fmt(gasCostRaw)}/mo total`;
+        }
+      } else { gasLine.textContent = ''; }
+
+      // EXPENSES → monthly
+      let totalMonthlyExp = gasCostYou;
+      const expRows = [];
+
+      // Gas row
+      if (gasCostRaw > 0) {
+        expRows.push({ name:'⛽ Gas', split: gasSplit, original: `$${fmt(gasCostRaw)}/mo`, monthly: gasCostYou });
+      }
+
+      expenses.forEach(exp => {
+        const amt = parseFloat(exp.amount) || 0;
+        if (!exp.name && !amt) return;
+        let monthly = toMonthly(amt, exp.freq);
+        if (exp.split) monthly = monthly / 2;
+        totalMonthlyExp += monthly;
+        expRows.push({
+          name: exp.name || '(unnamed)',
+          split: exp.split,
+          freq: freqLabel(exp.freq),
+          original: `$${fmt(amt)}/${freqLabel(exp.freq).toLowerCase()}`,
+          monthly
+        });
+      });
+
+      const monthlyLeftover = netMonthly - totalMonthlyExp;
+      const annualLeftover  = monthlyLeftover * 12;
+      const weeklyLeftover  = monthlyLeftover / 4.333;
+
+      // ── UPDATE UI ──
+      // Income pills
+      const pills = document.getElementById('incomePills');
+      pills.innerHTML = `
+        ${pill('Gross Annual', '$'+fmt(grossAnnual), '#5865f2')}
+        ${pill('Total Tax', '$'+fmt(annualTaxes)+'/yr ('+pct(totalTaxRate)+')', '#ed4245')}
+        ${pill('Net Annual', '$'+fmt(netAnnual), '#57f287')}
+        ${pill('Net Monthly', '$'+fmt(netMonthly), '#57f287')}
+        ${pill('Net '+capFirst(payFreq), '$'+fmt(netAnnual/periodsPerYear), '#fee75c')}
+      `;
+
+      // Summary stats
+      document.getElementById('s_monthly_income').textContent = '$'+fmt(netMonthly);
+      document.getElementById('s_monthly_expenses').textContent = '$'+fmt(totalMonthlyExp);
+      document.getElementById('s_monthly_leftover').textContent = (monthlyLeftover < 0 ? '-$' : '$') + fmt(Math.abs(monthlyLeftover));
+      document.getElementById('s_annual_leftover').textContent  = (annualLeftover  < 0 ? '-$' : '$') + fmt(Math.abs(annualLeftover));
+
+      // Leftover card color
+      const lc = document.getElementById('s_leftover_card');
+      const ls = document.getElementById('s_leftover_sub');
+      lc.className = 'stat-card ' + (monthlyLeftover >= 0 ? 'green' : 'red');
+      ls.textContent = monthlyLeftover >= 0 ? 'ready to save or spend 🎉' : '⚠️ expenses exceed income';
+
+      // Progress bar
+      const ratio = netMonthly > 0 ? Math.min(totalMonthlyExp / netMonthly, 1) : 0;
+      const pctVal = Math.round(ratio * 100);
+      const fill = document.getElementById('progressFill');
+      fill.style.width = (ratio*100)+'%';
+      fill.className = 'progress-fill' + (pctVal>=75?' danger': pctVal>=50?' warn':'');
+      document.getElementById('prog_label_left').textContent = '$'+fmt(totalMonthlyExp)+' expenses';
+      document.getElementById('prog_label_right').textContent = pctVal+'% of income';
+
+      // Income breakdown table
+      const ib = document.getElementById('incomeBreakdown');
+      const periods2 = [
+        { label:'Weekly',    gross: grossAnnual/52,     taxed: annualTaxes/52,     net: netAnnual/52     },
+        { label:'Bi-weekly', gross: grossAnnual/26,     taxed: annualTaxes/26,     net: netAnnual/26     },
+        { label:'Monthly',   gross: grossAnnual/12,     taxed: annualTaxes/12,     net: netAnnual/12     },
+        { label:'Annual',    gross: grossAnnual,        taxed: annualTaxes,        net: netAnnual        },
+      ];
+      ib.innerHTML = periods2.map(p=>`
+        <tr>
+          <td class="td-name">${p.label}</td>
+          <td class="td-amount">$${fmt(p.gross)}</td>
+          <td class="td-amount" style="color:var(--accent-r)">-$${fmt(p.taxed+(otherDed*(periodsPerYear/({weekly:52,biweekly:26,monthly:12,annual:1}[p.label.toLowerCase()]||1))))}</td>
+          <td class="td-amount" style="color:var(--accent-g)">$${fmt(p.net)}</td>
+        </tr>
+      `).join('');
+
+      // Expense breakdown
+      const eb = document.getElementById('expenseBreakdown');
+      eb.innerHTML = expRows.map(r=>`
+        <tr>
+          <td class="td-name">${r.name}</td>
+          <td class="td-split">${r.split?'💑 ÷2':''}</td>
+          <td class="td-amount" style="color:var(--txt2)">${r.original}</td>
+          <td class="td-amount" style="color:var(--accent-r)">$${fmt(r.monthly)}</td>
+        </tr>
+      `).join('') + `<tr class="breakdown-total">
+        <td colspan="3" style="color:var(--txt2)">Total Monthly Expenses</td>
+        <td class="td-amount" style="color:var(--accent-r)">$${fmt(totalMonthlyExp)}</td>
+      </tr>`;
+
+      // Leftover breakdown
+      const lb = document.getElementById('leftoverBreakdown');
+      const periods3 = [
+        { label:'Weekly',  income: netWeekly,    exp: totalMonthlyExp/4.333, left: weeklyLeftover },
+        { label:'Monthly', income: netMonthly,   exp: totalMonthlyExp,       left: monthlyLeftover },
+        { label:'6 Months',income: netMonthly*6, exp: totalMonthlyExp*6,     left: monthlyLeftover*6 },
+        { label:'Annual',  income: netAnnual,    exp: totalMonthlyExp*12,    left: annualLeftover },
+      ];
+      lb.innerHTML = periods3.map(p=>`
+        <tr>
+          <td class="td-name">${p.label}</td>
+          <td class="td-amount" style="color:var(--accent-g)">$${fmt(p.income)}</td>
+          <td class="td-amount" style="color:var(--accent-r)">$${fmt(p.exp)}</td>
+          <td class="td-amount" style="color:${p.left>=0?'var(--accent-g)':'var(--accent-r)'}">
+            ${p.left<0?'-$':'$'}${fmt(Math.abs(p.left))}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // ── HELPERS ──
+    function fmt(n) {
+      if (isNaN(n)||!isFinite(n)) return '0.00';
+      return n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+    }
+    function pct(r) { return Math.round(r*100)+'%'; }
+    function capFirst(s) { return s.charAt(0).toUpperCase()+s.slice(1); }
+    function pill(label, value, color) {
+      return `<div style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:8px 14px;display:flex;flex-direction:column;gap:3px">
+        <span style="font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--txt3)">${label}</span>
+        <span style="font-family:var(--mono);font-size:14px;font-weight:600;color:${color}">${value}</span>
+      </div>`;
+    }
+
+    // ── SAVE ──
+    function saveAll() {
+      const d = {
+        payType, payRate: v('payRate'), hoursPerWeek: v('hoursPerWeek'),
+        weeksPerYear: v('weeksPerYear'), payFreq: document.getElementById('payFreq').value,
+        fedTax: v('fedTax'), stateTax: v('stateTax'), ficaTax: v('ficaTax'),
+        otherDeductions: v('otherDeductions'),
+        gasPrice: v('gasPrice'), gasGallons: v('gasGallons'), gasFillups: v('gasFillups'),
+        gasSplit, expenses
+      };
+      localStorage.setItem('budgetData', JSON.stringify(d));
+      showToast('💾 Saved!');
+    }
+    function v(id) { return document.getElementById(id).value; }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg; t.classList.add('show');
+      setTimeout(()=>t.classList.remove('show'), 2200);
+    }
+
+    // Auto-save on any input
+    document.addEventListener('input', ()=>{ clearTimeout(window._saveTimer); window._saveTimer=setTimeout(saveAll,1200); });
+    document.addEventListener('change', ()=>{ clearTimeout(window._saveTimer); window._saveTimer=setTimeout(saveAll,1200); });
+
+    init();
+  </script>
+</body>
+</html>
