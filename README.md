@@ -1,4 +1,4 @@
-# 💸 Budget Tracker
+# Budget Tracker
 
 > A clean, Discord-inspired personal budget tracker — built with vanilla HTML, CSS & JS. No backend, no accounts, no BS.
 
